@@ -320,21 +320,29 @@ char *factor()
     return my_str;
 }
 
+
+
+
+
 int correctFutureBuffer( int num_args, ... )
 {
 
     va_list var_list;
     int my_x;
-    int futureBuff[MAX_SIZE], *p = futureBuff, *current;
+    int futureBuff[MAX_SIZE];
+    int *p = futureBuff; 
+    int *current;
     int warningGiven = 0;
     int toBeReturned = 0;
 
     va_start( var_list, num_args );
 
-    if( !num_args )
+    if( num_args == 0 ) //that is the value of num_args given is 0 (corresponds to EOI)
     {
         if( match(EOI) )
+        {
             toBeReturned = 1;
+        }
     }
     else
     {
