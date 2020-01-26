@@ -67,7 +67,6 @@ void statement()
                 }
             }
         }
-
         else if(match(IF)){
             look_forward();
             printf("if (\n");
@@ -142,14 +141,11 @@ void statement()
         {
             exit(1);
         }
-        // my_str = expression();
         confirm_semiColon:
             if( match( SEMI ) )
                 look_forward();
             else
                 printf("%d: Semicolon missing at this line\n", line_number );
-
-        // releaseMem( my_str );
 }
 
 void list_of_statements()
@@ -321,7 +317,33 @@ char *factor()
 }
 
 
+int my_func(int f_arg)
+{
+    int warningGiven = 0;
 
+    if(f_arg == 0)
+    {
+        if( match(EOI) )
+            return 1;
+    }
+    else
+    {
+        while( !match( SEMI ) ) 
+        {
+            if( match( f_arg ) )
+                return 1;
+
+            if( !warningGiven )
+            {
+                fprintf( stderr, "Line %d: Syntax error\n", line_number );
+                warningGiven = 1;
+            }
+            look_forward();
+       }
+    }
+
+    return 0;
+}
 
 
 int correctFutureBuffer( int num_args, ... )
