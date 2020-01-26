@@ -122,43 +122,54 @@ int lex(void)
 	                }
 	                yyleng = pres_p - yytext;
 	                char *check=(char *)(malloc((yyleng+10)*sizeof(char)));
+
 	                int i=0;
-	                for(i=0;i<yyleng;i++){
+	                for(i=0;i<yyleng;i++)
+	                {
 	                    check[i]=yytext[i];
 	                }
+
 	                check[yyleng]='\0';
-	                if(strcmp(check,"if")==0){
+
+	                if(strcmp(check,"if") == 0){
 	                    return IF;
 	                }
-	                if(strcmp(check,"do")==0){
+	                else if(strcmp(check,"do") == 0){
 	                    return DO;
 	                }
-	                if(strcmp(check,"end")==0){
+	                else if(strcmp(check,"end") == 0){
 	                    return END;
 	                }
-	                if(strcmp(check,"then")==0){
+	                else if(strcmp(check,"then") == 0){
 	                    return THEN;
 	                }
-	                if(strcmp(check,"begin")==0){
+	                else if(strcmp(check,"begin") == 0){
 	                    return BEGIN;
 	                }
-	                if(strcmp(check,"while")==0){
+	                else if(strcmp(check,"while") == 0){
 	                    return WHILE;
 	                }
-	                if(yyleng>0 && isalpha(yytext[0]))
+
+	                if(yyleng>0)
 	                {
-	                    for(;(isalnum(*pres_p) || isspace(*pres_p));pres_p++){
-	                    }
-	                    char help2=(*pres_p);
-	                    if(help2==':'){
-	                        return ID;
-	                    }
+	                	if(isalpha(yytext[0]))
+	                	{
+	                		for(;(isalnum(*pres_p) || isspace(*pres_p));pres_p++){
+		                    }
+		                    char cur_char=(*pres_p);
+
+		                    if(cur_char==':')
+		                    {
+		                        return ID;
+		                    }
+	                	}
 	                }
 	                return NUM_OR_ID;
 	            }
 	        }
-           
+	        
         pres_p++;
+
         }
     }
 }
