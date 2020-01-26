@@ -11,12 +11,12 @@ statements()
 
     expression();
 
-    if( match( SEMI ) )
+    if( common_check( SEMI ) )
 	look_forward();
     else
         fprintf( stderr, "%d: Inserting missing semicolon\n", line_number );
 
-    if( !match(EOI) )
+    if( !common_check(EOI) )
         statements();			/* Do another statement. */
 }
 
@@ -34,7 +34,7 @@ expr_prime()
      *              | epsilon
      */
 
-    if( match( PLUS ) )
+    if( common_check( PLUS ) )
     {
         look_forward();
         term();
@@ -56,7 +56,7 @@ term_prime()
      *       |   epsilon
      */
 
-    if( match( TIMES ) )
+    if( common_check( TIMES ) )
     {
         look_forward();
         factor();
@@ -70,17 +70,17 @@ factor()
      *          |     LP expression RP
      */
 
-    if( match(NUM_OR_ID) )
+    if( common_check(NUM_OR_ID) )
         look_forward();
 
-    else if( match(LP) )
+    else if( common_check(LP) )
     {
         look_forward();
         expression();
-        if( match(RP) )
+        if( common_check(RP) )
             look_forward();
         else
-            fprintf( stderr, "%d: Mismatched parenthesis\n", line_number);
+            fprintf( stderr, "%d: Miscommon_checked parenthesis\n", line_number);
     }
     else
 	fprintf( stderr, "%d Number or identifier expected\n", line_number );

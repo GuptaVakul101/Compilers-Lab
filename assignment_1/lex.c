@@ -175,7 +175,7 @@ int lex(void)
 }
 
 static int next_tok = -1;
-int match(int symb)
+int common_check(int symb)
 {
     if(next_tok == -1)
     {

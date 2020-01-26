@@ -20,25 +20,25 @@ char *comparator();
 
 void statements()
 {
-    while(!match(EOI))
+    while(!common_check(EOI))
     {
-        statement();
+        stmnt();
     }
 }
 
 void confirm_semiColon()
 {
-    if( match( SEMI ) )
+    if( common_check( SEMI ) )
         look_forward();
     else
         printf("%d: Inserting missing semicolon\n", line_number );
 }
 
-void statement()
+void stmnt()
 {
     /*  statements -> expression SEMI  |  expression SEMI statements  */
         char *my_str;
-        if(match(ID))
+        if(common_check(ID))
         {
             char array[100];
             for(int i=0;i<cur_size;i++)
@@ -67,7 +67,7 @@ void statement()
                 }
             }
         }
-        else if(match(IF)){
+        else if(common_check(IF)){
             look_forward();
             printf("if (\n");
 
@@ -84,12 +84,12 @@ void statement()
                 printf("%s)\nthen {\n", my_str);
                 look_forward();
                 releaseMem(my_str);
-                statement();
+                stmnt();
                 printf("}\n");
                 return;
             }
         }
-        else if(match(WHILE))
+        else if(common_check(WHILE))
         {
             look_forward();
             printf("while (\n");
@@ -105,12 +105,12 @@ void statement()
                 printf("%s)\n do {\n", my_str);
                 look_forward();
                 releaseMem(my_str);
-                statement();
+                stmnt();
                 printf("}\n");
                 return;
             }
         }
-        else if(match(BEGIN))
+        else if(common_check(BEGIN))
         {
             printf("BEGIN{\n");
 
@@ -142,7 +142,7 @@ void statement()
             exit(1);
         }
         confirm_semiColon:
-            if( match( SEMI ) )
+            if( common_check( SEMI ) )
                 look_forward();
             else
                 printf("%d: Semicolon missing at this line\n", line_number );
@@ -152,13 +152,13 @@ void list_of_statements()
 {
     while(1)
     {
-        if(match(END) || match(EOI))
+        if(common_check(END) || common_check(EOI))
         {
             break;
         }
-        statement();
+        stmnt();
     }
-    if(match(EOI))
+    if(common_check(EOI))
     {
         fprintf( stderr, "%d:The file has been completed. END statement not found\n", line_number );
     }
@@ -168,7 +168,7 @@ char *comparator()
 {
     char *my_str3;
     char *my_str=expression();
-    if( match(GT) )
+    if( common_check(GT) )
     {
         releaseMem(my_str);
         my_str3=new_register();
@@ -185,7 +185,7 @@ char *comparator()
 
         return my_str3;
     }
-    else if(match(LT))
+    else if(common_check(LT))
     {
         releaseMem(my_str);
         my_str3=new_register();
@@ -201,7 +201,7 @@ char *comparator()
         releaseMem(my_str2);
         return my_str3;
     }
-    else if(match(EQUAL))
+    else if(common_check(EQUAL))
     {
         releaseMem(my_str);
         my_str3=new_register();
@@ -228,7 +228,7 @@ char *expression()
 
     while(flag)
     {
-        if(match( PLUS ))
+        if(common_check( PLUS ))
         {
             look_forward();
             my_str2 = term();
@@ -236,7 +236,7 @@ char *expression()
             printf("%s += %s\n", my_str, my_str2 );
             releaseMem( my_str2 );
         }
-        else if(match( MINUS ))
+        else if(common_check( MINUS ))
         {
             look_forward();
             my_str2 = term();
@@ -260,8 +260,8 @@ char *term()
 
     while(1)
     {
-        int f1 = match(TIMES);
-        int f2 = match(DIV);
+        int f1 = common_check(TIMES);
+        int f2 = common_check(DIV);
 
         if(f1 || f2)
         {
@@ -291,7 +291,7 @@ char *factor()
 {
     char *my_str=NULL;
 
-    if( match(NUM_OR_ID))
+    if( common_check(NUM_OR_ID))
     {
         if(isalpha(cur_para[0]))
             printf("%s = _%.*s\n", my_str = new_register(), cur_size, cur_para );
@@ -299,14 +299,14 @@ char *factor()
             printf("%s = %.*s\n", my_str = new_register(), cur_size, cur_para );
         look_forward();
     }
-    else if( match(LP) )
+    else if( common_check(LP) )
     {
         look_forward();
         my_str = expression();
-        if( match(RP) )
+        if( common_check(RP) )
             look_forward();
         else
-            printf("%d: Brackets are not matching\n", line_number );
+            printf("%d: Brackets are not common_checking\n", line_number );
     }
     else
     {
@@ -323,14 +323,14 @@ int correctFutureBuffer(int f_arg)
 
     if(f_arg == 0)
     {
-        if( match(EOI) )
+        if( common_check(EOI) )
             return 1;
     }
     else
     {
-        while( !match( SEMI ) ) 
+        while( !common_check( SEMI ) ) 
         {
-            if( match( f_arg ) )
+            if( common_check( f_arg ) )
                 return 1;
 
             if( !warningGiven )
@@ -361,7 +361,7 @@ int correctFutureBuffer(int f_arg)
 
     if( num_args == 0 ) //that is the value of num_args given is 0 (corresponds to EOI)
     {
-        if( match(EOI) )
+        if( common_check(EOI) )
         {
             toBeReturned = 1;
         }
@@ -372,9 +372,9 @@ int correctFutureBuffer(int f_arg)
         while( (my_x = va_arg(var_list, int)) && p < &futureBuff[MAX_SIZE] )
             *p++ = my_x;
 
-        while( !match( SEMI ) ) {
+        while( !common_check( SEMI ) ) {
             for( current = futureBuff; current < p ; ++current )
-            if( match( *current ) )
+            if( common_check( *current ) )
             {
                 toBeReturned = 1;
                 va_end( var_list );

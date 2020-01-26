@@ -11,11 +11,11 @@ statements()
 {
     /*  statements -> expression SEMI |  expression SEMI statements */
 
-    while( !match(EOI) )
+    while( !common_check(EOI) )
     {
         expression();
 
-        if( match( SEMI ) )
+        if( common_check( SEMI ) )
             look_forward();
         else
             fprintf( stderr, "%d: Inserting missing semicolon\n", line_number );
@@ -32,7 +32,7 @@ void    expression()
 	return;
 
     term();
-    while( match( PLUS ) )
+    while( common_check( PLUS ) )
     {
         look_forward();
         term();
@@ -45,7 +45,7 @@ void    term()
 	return;
 
     factor();
-    while( match( TIMES ) )
+    while( common_check( TIMES ) )
     {
         look_forward();
         factor();
@@ -57,17 +57,17 @@ void    factor()
     if( !legal_next_tok( NUM_OR_ID, LP, 0 ) )
 	return;
 
-    if( match(NUM_OR_ID) )
+    if( common_check(NUM_OR_ID) )
         look_forward();
 
-    else if( match(LP) )
+    else if( common_check(LP) )
     {
         look_forward();
         expression();
-        if( match(RP) )
+        if( common_check(RP) )
             look_forward();
         else
-            fprintf( stderr, "%d: Mismatched parenthesis\n", line_number );
+            fprintf( stderr, "%d: Miscommon_checked parenthesis\n", line_number );
     }
     else
 	fprintf( stderr, "%d: Number or identifier expected\n", line_number );
@@ -100,7 +100,7 @@ int	first_arg;
 
     if( !first_arg )
     {
-	if( match(EOI) )
+	if( common_check(EOI) )
 	    rval = 1;
     }
     else
@@ -109,10 +109,10 @@ int	first_arg;
 	while( (tok = va_arg(args, int)) && p < &next_toks[MAX_SIZE] )
 	    *p++ = tok;
 
-	while( !match( SEMI ) )
+	while( !common_check( SEMI ) )
 	{
 	    for( current = next_toks; current < p ; ++current )
-		if( match( *current ) )
+		if( common_check( *current ) )
 		{
 		    rval = 1;
 		    goto exit;
