@@ -83,7 +83,7 @@ def handle_conditions():
 				gen_out("LDA "+f1[line_ptr].split()[2])
 			else:
 				gen_out("PUSH PSW\nLDA " + f1[line_ptr].split()[2] + "\nMOV "+ temp_regs[f1[line_ptr].split()[0]] +", A\nPOP PSW")
-	line_ptr+=1	
+	line_ptr+=1
 
 
 def handle_while():
@@ -131,7 +131,7 @@ def handle_statement():
 			gen_out("ADD " + temp_regs[f1[line_ptr].split()[2]])
 		else:
 			gen_out("PUSH PSW\nMOV A, "+temp_regs[f1[line_ptr].split()[0]] + "\nADD " + temp_regs[f1[line_ptr].split()[2]] + "\nMOV "+ temp_regs[f1[line_ptr].split()[0]] +", A\nPOP PSW")
-	
+
 	elif "*=" in f1[line_ptr]:
 		if f1[line_ptr].split()[0] == "t0":
 			b = temp_regs[f1[line_ptr].split()[0]]
@@ -151,7 +151,7 @@ def handle_statement():
 			c = temp_regs[f1[line_ptr].split()[2]]
 			gen_out("PUSH PSW")
 			gen_out("MOV A, " + c)
-			gen_out("PUSH PSW")			
+			gen_out("PUSH PSW")
 			gen_out("MVI A, 0")
 			label = get_new_l_label()
 			gen_out(label + ":")
@@ -162,7 +162,7 @@ def handle_statement():
 			gen_out("POP PSW")
 			gen_out("MOV " + c +", A")
 			gen_out("POP PSW")
-	
+
 	elif "/=" in f1[line_ptr]:
 		if f1[line_ptr].split()[0] == "t0":
 			b = temp_regs[f1[line_ptr].split()[0]]

@@ -1,0 +1,42 @@
+BEGIN{
+BEGIN{
+if (
+t0 = _a
+t1 <- t0
+t2 = 2
+t0 <-  t1 == t2
+t0)
+then {
+while (
+t0 = _c
+t2 <- t0
+t1 = 4
+t0 <-  t2 == t1
+t0)
+ do {
+BEGIN{
+if (
+t0 = _a
+t1 <- t0
+t2 = 6
+t0 <-  t1 == t2
+t0)
+then {
+t0 = 6
+_b <- t0
+}
+} END
+}
+}
+} END
+if (
+t0 = _a
+t2 <- t0
+t1 = 5
+t0 <-  t2 == t1
+t0)
+then {
+t0 = 6
+_b <- t0
+}
+} END
