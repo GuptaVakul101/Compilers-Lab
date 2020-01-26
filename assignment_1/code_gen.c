@@ -16,7 +16,7 @@ extern char *new_register(void);
 extern void releaseMem( char *name );
 
 char *comparator();
-int correctFutureBuffer( int num_args  , ...);
+//int correctFutureBuffer( int num_args  , ...);
 
 void statements()
 {
@@ -47,14 +47,14 @@ void statement()
             array[cur_size]='\0';
 
             look_forward();  
-            if(!correctFutureBuffer( COL, 0 ) )
+            if(!correctFutureBuffer( COL) )
             {
                 printf("%d: Semi Colon is missing at this line: \n", line_number );
                 confirm_semiColon();
             }
             else{
                 look_forward();
-                if( !correctFutureBuffer( EQUAL, 0 ) )
+                if( !correctFutureBuffer( EQUAL ) )
                 {
                     printf("%d: Equal sign missing at this line\n", line_number );
                     confirm_semiColon();
@@ -73,7 +73,7 @@ void statement()
 
             my_str = comparator();
 
-            if( !correctFutureBuffer( THEN, 0 ) )
+            if( !correctFutureBuffer( THEN) )
             {
                 releaseMem(my_str);
                 printf("%d: Then sign missing at this line\n", line_number );
@@ -94,7 +94,7 @@ void statement()
             look_forward();
             printf("while (\n");
             my_str = comparator();
-            if( !correctFutureBuffer( DO, 0 ) )
+            if( !correctFutureBuffer( DO) )
             {
                 releaseMem(my_str);
                 printf("%d: Do sign missing at this line\n", line_number );
@@ -116,7 +116,7 @@ void statement()
 
             look_forward();
             list_of_statements();
-            if(!correctFutureBuffer(END,0))
+            if(!correctFutureBuffer(END))
             {
                 printf("%d: END missing at this line\n", line_number );
                 confirm_semiColon();
@@ -317,7 +317,7 @@ char *factor()
 }
 
 
-int my_func(int f_arg)
+int correctFutureBuffer(int f_arg)
 {
     int warningGiven = 0;
 
@@ -346,7 +346,7 @@ int my_func(int f_arg)
 }
 
 
-int correctFutureBuffer( int num_args, ... )
+/*int correctFutureBuffer( int num_args, ... )
 {
 
     va_list var_list;
@@ -391,4 +391,4 @@ int correctFutureBuffer( int num_args, ... )
 
     va_end( var_list );
     return toBeReturned;
-}
+}*/
