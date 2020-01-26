@@ -2,15 +2,15 @@
 #include <stdio.h>
 #include <ctype.h>
 
-int yylineno = 0;
-char* yytext = "";
-int yyleng   = 0;
+int line_number = 0;
+char* cur_para = "";
+int cur_size   = 0;
 
 int lex(void)
 {
     char *pres_p;
     static char arr[2020];
-    pres_p = yytext + yyleng;
+    pres_p = cur_para + cur_size;
 
     for(int i=1;i>0;)
     {
@@ -26,7 +26,7 @@ int lex(void)
             while(*pres_p == ' ' || *pres_p == '\n' || *pres_p == '\t' || *pres_p == '\v' || *pres_p == '\f' || *pres_p == '\r'){
                 pres_p++;
             }
-            yylineno++;
+            line_number++;
         }
         while(1)
         {
@@ -34,8 +34,8 @@ int lex(void)
                 break;
             }
 
-            yytext = pres_p;
-            yyleng = 1;
+            cur_para = pres_p;
+            cur_size = 1;
 
             char check_c=(*pres_p);
             int answer = -1;
@@ -120,16 +120,16 @@ int lex(void)
 	            {
 	                for(;isalnum(*pres_p);pres_p++){
 	                }
-	                yyleng = pres_p - yytext;
-	                char *check=(char *)(malloc((yyleng+10)*sizeof(char)));
+	                cur_size = pres_p - cur_para;
+	                char *check=(char *)(malloc((cur_size+10)*sizeof(char)));
 
 	                int i=0;
-	                for(i=0;i<yyleng;i++)
+	                for(i=0;i<cur_size;i++)
 	                {
-	                    check[i]=yytext[i];
+	                    check[i]=cur_para[i];
 	                }
 
-	                check[yyleng]='\0';
+	                check[cur_size]='\0';
 
 	                if(strcmp(check,"if") == 0){
 	                    return IF;
@@ -150,9 +150,9 @@ int lex(void)
 	                    return WHILE;
 	                }
 
-	                if(yyleng>0)
+	                if(cur_size>0)
 	                {
-	                	if(isalpha(yytext[0]))
+	                	if(isalpha(cur_para[0]))
 	                	{
 	                		for(;(isalnum(*pres_p) || isspace(*pres_p));pres_p++){
 		                    }
@@ -167,26 +167,34 @@ int lex(void)
 	                return NUM_OR_ID;
 	            }
 	        }
-	        
+
         pres_p++;
 
         }
     }
 }
 
-static int Lookahead = -1;
-int match(int token){
-    if(Lookahead == -1)
-        Lookahead = lex();
-    int ans=-1;
-    if(token==Lookahead){
+static int next_tok = -1;
+int match(int symb)
+{
+    if(next_tok == -1)
+    {
+        next_tok = lex();
+    }
+
+    int ans = 1;
+    if(symb == next_tok)
+    {
         ans=1;
-    }else{
+    }
+    else
+    {
         ans=0;
     }
     return ans;
 }
 
-void advance(void){
-    Lookahead = lex();
+void look_forward(void)
+{
+    next_tok = lex();
 }

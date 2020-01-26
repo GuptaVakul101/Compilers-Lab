@@ -19,6 +19,6 @@
 #define ID 			18   /* Identifier		*/
 #define COL 		19   /*	:				*/
 
-extern char *yytext;		/* in lex.c			*/
-extern int yyleng;
-extern yylineno;
+extern char *cur_para;		/* in lex.c			*/
+extern int cur_size;
+extern line_number;

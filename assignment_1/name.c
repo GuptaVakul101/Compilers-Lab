@@ -1,23 +1,26 @@
-char  *Names[] = { "t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7" };   
-char  **Namep  = Names;   
+char  *registers[] = { "t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7" };   
+char  **register_p  = registers;   
    
-char  *newname()   
+char  *new_register()   
 {   
-    if( Namep >= &Names[ sizeof(Names)/sizeof(*Names) ] )   
+    if( register_p >= &registers[ sizeof(registers)/sizeof(*registers) ] )   
     {   
-        fprintf( stderr, "%d: Expression too complex\n", yylineno );   
-        exit( 1 );   
+        fprintf( stderr, "%d: Expression too complex\n", line_number );   
+        exit(1);   
     }   
    
-    return( *Namep++ );   
+    return( *register_p++ );   
 }   
    
 void releaseMem(s)   
-char    *s;   
+char *s;   
 {   
-    if( Namep > Names )   
-    *--Namep = s;   
-    else   
-    fprintf(stderr, "%d: (Internal error) Name stack underflow\n",   
-                                yylineno );   
+    if( register_p > registers )   
+    {
+        *--register_p = s;   
+    }
+    else
+    {
+        fprintf(stderr, "%d: (Internal error) Name stack underflow\n",line_number );   
+    }   
 }   

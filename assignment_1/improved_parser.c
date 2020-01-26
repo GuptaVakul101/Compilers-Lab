@@ -16,9 +16,9 @@ statements()
         expression();
 
         if( match( SEMI ) )
-            advance();
+            look_forward();
         else
-            fprintf( stderr, "%d: Inserting missing semicolon\n", yylineno );
+            fprintf( stderr, "%d: Inserting missing semicolon\n", line_number );
     }
 }
 
@@ -28,56 +28,56 @@ void    expression()
      * expression' -> PLUS term expression' |  epsilon
      */
 
-    if( !legal_lookahead( NUM_OR_ID, LP, 0 ) )
+    if( !legal_next_tok( NUM_OR_ID, LP, 0 ) )
 	return;
 
     term();
     while( match( PLUS ) )
     {
-        advance();
+        look_forward();
         term();
     }
 }
 
 void    term()
 {
-    if( !legal_lookahead( NUM_OR_ID, LP, 0 ) )
+    if( !legal_next_tok( NUM_OR_ID, LP, 0 ) )
 	return;
 
     factor();
     while( match( TIMES ) )
     {
-        advance();
+        look_forward();
         factor();
     }
 }
 
 void    factor()
 {
-    if( !legal_lookahead( NUM_OR_ID, LP, 0 ) )
+    if( !legal_next_tok( NUM_OR_ID, LP, 0 ) )
 	return;
 
     if( match(NUM_OR_ID) )
-        advance();
+        look_forward();
 
     else if( match(LP) )
     {
-        advance();
+        look_forward();
         expression();
         if( match(RP) )
-            advance();
+            look_forward();
         else
-            fprintf( stderr, "%d: Mismatched parenthesis\n", yylineno );
+            fprintf( stderr, "%d: Mismatched parenthesis\n", line_number );
     }
     else
-	fprintf( stderr, "%d: Number or identifier expected\n", yylineno );
+	fprintf( stderr, "%d: Number or identifier expected\n", line_number );
 }
 #include <stdarg.h>
 
-#define MAXFIRST 16
-#define SYNCH	 SEMI
+#define MAX_SIZE 16
+#define SEMI	 SEMI
 
-int	legal_lookahead(  first_arg )
+int	legal_next_tok(  first_arg )
 int	first_arg;
 {
     /* Simple error detection and recovery. Arguments are a 0-terminated list of
@@ -92,7 +92,7 @@ int	first_arg;
 
     va_list  	args;
     int		tok;
-    int		lookaheads[MAXFIRST], *p = lookaheads, *current;
+    int		next_toks[MAX_SIZE], *p = next_toks, *current;
     int		error_printed = 0;
     int		rval	      = 0;
 
@@ -106,12 +106,12 @@ int	first_arg;
     else
     {
 	*p++ = first_arg;
-	while( (tok = va_arg(args, int)) && p < &lookaheads[MAXFIRST] )
+	while( (tok = va_arg(args, int)) && p < &next_toks[MAX_SIZE] )
 	    *p++ = tok;
 
-	while( !match( SYNCH ) )
+	while( !match( SEMI ) )
 	{
-	    for( current = lookaheads; current < p ; ++current )
+	    for( current = next_toks; current < p ; ++current )
 		if( match( *current ) )
 		{
 		    rval = 1;
@@ -120,11 +120,11 @@ int	first_arg;
 
 	    if( !error_printed )
 	    {
-		fprintf( stderr, "Line %d: Syntax error\n", yylineno );
+		fprintf( stderr, "Line %d: Syntax error\n", line_number );
 		error_printed = 1;
 	    }
 
-	    advance();
+	    look_forward();
 	}
     }
 
