@@ -2,120 +2,223 @@
 #include <stdio.h>
 #include <ctype.h>
 
-int yylineno = 0;
-char* yytext = "";
-int yyleng   = 0;
+
+char* yytext = ""; /* Lexeme (not '\0'
+                      terminated)              */
+int yyleng   = 0;  /* Lexeme length.           */
+int yylineno = 0;  /* Input line number        */
 
 int lex(void){
-    char *current;
-    static char input_buffer[2020];
-    current = yytext + yyleng;
-    while(4){
-        while(!*current ){
-            current = input_buffer;
-            if(gets(input_buffer)==0){
-                *current = '\0' ;
-                return EOI;
-            }
-            for(;isspace(*current);current++){
-            }
-            yylineno++;
-        }
-        for(; *current; ++current){
-            /* Get the next token */
-            yytext = current;
-            yyleng = 1;
-            char help=(*current);
-            if(help==';'){
-                return SEMI;
-            }
-            if(help=='+'){
-                return PLUS;
-            }
-            if(help=='-'){
-                return MINUS;
-            }
-            if(help=='*'){
-                return TIMES;
-            }
-            if(help=='/'){
-                return DIV;
-            }
-            if(help=='('){
-                return LP;
-            }
-            if(help==')'){
-                return RP;
-            }
-            if(help=='>'){
-                return GT;
-            }
-            if(help=='<'){
-                return LT;
-            }
-            if(help=='='){
-                return EQUAL;
-            }
-            if(help==':'){
-                return COL;
-            }
+
+   static char input_buffer[1024];
+   char        *current;
+
+   current = yytext + yyleng; /* Skip current
+                                 lexeme        */
+
+   while(1){       /* Get the next one         */
+      while(!*current ){
+         /* Get new lines, skipping any leading
+         * white space on the line,
+         * until a nonblank line is found.
+         */
+
+         current = input_buffer;
+         if(!gets(input_buffer)){
+            *current = '\0' ;
+
+            return EOI;
+         }
+         ++yylineno;
+         while(isspace(*current))
+            ++current;
+      }
+      for(; *current; ++current){
+         /* Get the next token */
+         yytext = current;
+         yyleng = 1;
+         switch( *current ){
+           case ';':
+            return SEMI;
+           case '+':
+            return PLUS;
+           case '-':
+            return MINUS;
+           case '*':
+            return TIMES;
+           case '/':
+            return DIV;
+           case '(':
+            return LP;
+           case ')':
+            return RP;
+           case '>':
+            return GT;
+           case '<':
+            return LT;
+           case '=':
+            return EQUAL;
+           case ':':
+            return COL;
+           case '\n':
+           case '\t':
+           case ' ' :
+            break;
+           default:
             if(!isalnum(*current))
-            fprintf(stderr, "Not alphanumeric <%c>\n", *current);
+               fprintf(stderr, "Not alphanumeric <%c>\n", *current);
             else{
-                for(;isalnum(*current);current++){
-                }
-                yyleng = current - yytext;
-                char *check=(char *)(malloc((yyleng+10)*sizeof(char)));
-                int i=0;
-                for(i=0;i<yyleng;i++){
-                    check[i]=yytext[i];
-                }
-                check[yyleng]='\0';
-                if(strcmp(check,"if")==0){
-                    return IF;
-                }
-                if(strcmp(check,"do")==0){
-                    return DO;
-                }
-                if(strcmp(check,"end")==0){
-                    return END;
-                }
-                if(strcmp(check,"then")==0){
-                    return THEN;
-                }
-                if(strcmp(check,"begin")==0){
-                    return BEGIN;
-                }
-                if(strcmp(check,"while")==0){
-                    return WHILE;
-                }
-                if(yyleng>0 && isalpha(yytext[0]))
-                {
-                    for(;(isalnum(*current) || isspace(*current));current++){
-                    }
-                    char help2=(*current);
-                    if(help2==':'){
-                        return ID;
-                    }
-                }
-                return NUM_OR_ID;
+               while(isalnum(*current))
+                  ++current;
+               yyleng = current - yytext;
+               //Comparing the lexemes with length more than 1,we use temporary buffer
+               
+               if (yyleng==2 && yytext[0]=='i' && yytext[1]=='f'){
+                 return IF;
+               }
+               if (yyleng==2 && yytext[0]=='d' && yytext[1]=='o'){
+                 return DO;
+               }
+               if (yyleng==3 && yytext[0]=='e' && yytext[1]=='n' && yytext[2]=='d' ){
+                 return END;
+               }
+               if (yyleng==4 && yytext[0]=='t' && yytext[1]=='h' && yytext[2]=='e' && yytext[3]=='n'){
+                 return THEN;
+               }
+               if (yyleng==5 && yytext[0]=='b' && yytext[1]=='e' && yytext[2]=='g' && yytext[3]=='i' && yytext[4]=='n'){
+                 return BEGIN;
+               }
+               if (yyleng==5 && yytext[0]=='w' && yytext[1]=='h' && yytext[2]=='i' && yytext[3]=='l' && yytext[4]=='e'){
+                 return WHILE;
+               }
+               if(yyleng>0 && isalpha(yytext[0]))
+               {
+                 while(isalnum(*current) || isspace(*current))
+                  current++;
+                if(*current==':')
+                 return ID;
+               }
+
+               return NUM_OR_ID;
             }
-        }
-    }
+            break;
+         }
+      }
+   }
 }
-static int Lookahead = -1;
+
+
+static int Lookahead = -1; /* Lookahead token  */
+
 int match(int token){
-    if(Lookahead == -1)
-        Lookahead = lex();
-    int ans=-1;
-    if(token==Lookahead){
-        ans=1;
-    }else{
-        ans=0;
-    }
-    return ans;
+   /* Return true if "token" matches the
+      current lookahead symbol.                */
+
+   if(Lookahead == -1)
+      Lookahead = lex();
+    // if(token==ID && Lookahead==NUM_OR_ID){
+    //   return 1;
+    // }
+    // else
+    //   return 0;
+    return token==Lookahead;
 }
 
 void advance(void){
+/* Advance the lookahead to the next
+   input symbol.                               */
+
     Lookahead = lex();
 }
+// #include "lex.h"
+// #include <stdio.h>
+// #include <ctype.h>
+
+
+// char* yytext = ""; /* Lexeme (not '\0'
+//                       terminated)              */
+// int yyleng   = 0;  /* Lexeme length.           */
+// int yylineno = 0;  /* Input line number        */
+
+// int lex(void){
+
+//    static char input_buffer[1024];
+//    char        *current;
+
+//    current = yytext + yyleng; /* Skip current
+//                                  lexeme        */
+
+//    while(1){       /* Get the next one         */
+//       while(!*current ){
+//          /* Get new lines, skipping any leading
+//          * white space on the line,
+//          * until a nonblank line is found.
+//          */
+
+//          current = input_buffer;
+//          if(!gets(input_buffer)){
+//             *current = '\0' ;
+
+//             return EOI;
+//          }
+//          ++yylineno;
+//          while(isspace(*current))
+//             ++current;
+//       }
+//       for(; *current; ++current){
+//          /* Get the next token */
+//          yytext = current;
+//          yyleng = 1;
+//          switch( *current ){
+//            case ';':
+//             return SEMI;
+//            case '+':
+//             return PLUS;
+//            case '-':
+//             return MINUS;
+//            case '*':
+//             return TIMES;
+//            case '/':
+//             return DIV;
+//            case '(':
+//             return LP;
+//            case ')':
+//             return RP;
+//            case '\n':
+//            case '\t':
+//            case ' ' :
+//             break;
+//            default:
+//             if(!isalnum(*current))
+//                fprintf(stderr, "Not alphanumeric <%c>\n", *current);
+//             else{
+//                while(isalnum(*current))
+//                   ++current;
+//                yyleng = current - yytext;
+//                return NUM_OR_ID;
+//             }
+//             break;
+//          }
+//       }
+//    }
+// }
+
+
+// static int Lookahead = -1; /* Lookahead token  */
+
+// int match(int token){
+//    /* Return true if "token" matches the
+//       current lookahead symbol.                */
+
+//    if(Lookahead == -1)
+//       Lookahead = lex();
+
+//    return token == Lookahead;
+// }
+
+// void advance(void){
+// /* Advance the lookahead to the next
+//    input symbol.                               */
+
+//     Lookahead = lex();
+// }
